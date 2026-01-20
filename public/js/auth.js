@@ -1,190 +1,140 @@
 import { auth, db } from "./firebase.js";
 import { qs, showMsg, hideMsg } from "./utils.js";
-import { auth, db } from "./firebase.js";
-import { qs, showMsg, hideMsg } from "./utils.js";
 import {
  signInWithEmailAndPassword,
  sendPasswordResetEmail,
  createUserWithEmailAndPassword,
  signOut
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { getInviteByCode, markInviteUsed } from "./api.js";
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getInviteByCode, markInviteUsed } from "./api.js";
-
-/** Detecta si estamos corriendo desde la raíz del repo (GitHub Pages) */
-function isRootLoginPage() {
-  // Si el pathname termina en "/control-dotacion/" o "/control-dotacion/index.html"
-  const p = location.pathname;
-  return p.endsWith("/control-dotacion/") || p.endsWith("/control-dotacion/index.html");
+/* =========================
+  Helpers de debug
+========================= */
+function detailMsg(e) {
+ const code = e?.code ? String(e.code) : "";
+ const msg = e?.message ? String(e.message) : String(e);
+ return code ? `${code}: ${msg}` : msg;
 }
-
-/** Redirección correcta según dónde esté el HTML */
-function goDashboard() {
-  // Si estás en index.html en la raíz, dashboard está en /public/
-  if (isRootLoginPage()) {
-    location.href = "public/dashboard.html";
-  } else {
-    // Si estás dentro de /public/, dashboard está al mismo nivel
-    location.href = "dashboard.html";
-  }
-}
-
-function goIndex() {
-  // Si estás en /public/ y quieres volver a index raíz:
-  // (si tu logout está en dashboard dentro de /public/)
-  const p = location.pathname;
-  if (p.includes("/control-dotacion/public/")) {
-    location.href = "../index.html";
-  } else {
-    location.href = "index.html";
-  }
-}
-
-function debugError(e) {
-  // Armamos un texto útil para UI + consola
-  const code = e?.code ? String(e.code) : "sin-code";
-  const message = e?.message ? String(e.message) : "sin-message";
-  const name = e?.name ? String(e.name) : "sin-name";
-  return { code, message, name };
-}
-
-function showRealError(msgEl, prefix, e) {
-  const { code, message } = debugError(e);
-  console.error(prefix, e);
-  showMsg(msgEl, `${prefix}\n${code}\n${message}`, "bad");
-}
-
-// LOGIN
+window.addEventListener("error", (ev) => {
+ console.error("window.error:", ev.error || ev.message, ev);
+});
+window.addEventListener("unhandledrejection", (ev) => {
+ console.error("unhandledrejection:", ev.reason);
+});
+/* =========================
+  LOGIN
+========================= */
 const loginBtn = qs("btnLogin");
 const forgotBtn = qs("btnForgot");
 const logoutBtn = qs("btnLogout");
-
 if (loginBtn) {
-  loginBtn.addEventListener("click", async () => {
-    const msg = qs("msg");
-    hideMsg(msg);
-
-    const emailEl = qs("email");
-    const passEl = qs("password");
-
-    const email = (emailEl?.value || "").trim();
-    const pass = passEl?.value || "";
-
-    if (!email || !pass) {
-      showMsg(msg, "Debes ingresar correo y contraseña.", "warn");
-      return;
-    }
-
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      showMsg(msg, "Ingreso OK. Redirigiendo...", "ok");
-      setTimeout(goDashboard, 200);
-    } catch (e) {
-      // ✅ aquí verás el error real
-      showRealError(msg, "No se pudo ingresar (detalle):", e);
-    }
-  });
+ console.log("✅ btnLogin encontrado");
+ loginBtn.addEventListener("click", async () => {
+   console.log("👉 click btnLogin");
+   const msg = qs("msg");
+   hideMsg(msg);
+   const emailEl = qs("email");
+   const passEl = qs("password");
+   const email = (emailEl ? emailEl.value : "").trim();
+   const pass = passEl ? passEl.value : "";
+   if (!email || !pass) {
+     showMsg(msg, "Debes ingresar correo y contraseña.", "warn");
+     return;
+   }
+   try {
+     await signInWithEmailAndPassword(auth, email, pass);
+     location.href = "dashboard.html";
+   } catch (e) {
+     console.error("LOGIN ERROR:", e);
+     showMsg(msg, "No se pudo ingresar (detalle): " + detailMsg(e), "bad");
+   }
+ });
+} else {
+ console.warn("⚠️ btnLogin NO encontrado en esta página");
 }
-
-// RESET PASSWORD
 if (forgotBtn) {
-  forgotBtn.addEventListener("click", async () => {
-    const msg = qs("msg");
-    hideMsg(msg);
-
-    const email = (qs("email")?.value || "").trim();
-    if (!email) {
-      showMsg(msg, "Ingresa tu correo para enviar reset.", "warn");
-      return;
-    }
-
-    try {
-      await sendPasswordResetEmail(auth, email);
-      showMsg(msg, "Correo de restablecimiento enviado.", "ok");
-    } catch (e) {
-      // ✅ error real del reset
-      showRealError(msg, "No se pudo enviar reset (detalle):", e);
-    }
-  });
+ forgotBtn.addEventListener("click", async () => {
+   const msg = qs("msg");
+   hideMsg(msg);
+   const email = (qs("email") ? qs("email").value : "").trim();
+   if (!email) {
+     showMsg(msg, "Ingresa tu correo para enviar reset.", "warn");
+     return;
+   }
+   try {
+     await sendPasswordResetEmail(auth, email);
+     showMsg(msg, "Correo de restablecimiento enviado.", "ok");
+   } catch (e) {
+     console.error("RESET ERROR:", e);
+     showMsg(msg, "No se pudo enviar reset: " + detailMsg(e), "bad");
+   }
+ });
 }
-
-// LOGOUT
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      await signOut(auth);
-      goIndex();
-    } catch (e) {
-      console.error("LOGOUT ERROR:", e);
-      // Si tienes un msg en dashboard puedes mostrarlo; si no, alert simple:
-      const msg = qs("msg");
-      if (msg) showRealError(msg, "No se pudo cerrar sesión (detalle):", e);
-      else alert("No se pudo cerrar sesión. Revisa consola.");
-    }
-  });
+ logoutBtn.addEventListener("click", async () => {
+   await signOut(auth);
+   location.href = "index.html";
+ });
 }
-
-// REGISTER
+/* =========================
+  REGISTER
+========================= */
 const regBtn = qs("btnRegister");
-
 if (regBtn) {
-  regBtn.addEventListener("click", async () => {
-    const msg = qs("msg");
-    hideMsg(msg);
-
-    const code = (qs("inviteCode")?.value || "").trim().toUpperCase();
-    const email = (qs("email")?.value || "").trim();
-    const pass = qs("password")?.value || "";
-
-    if (!code || !email || !pass) {
-      showMsg(msg, "Debes completar código, correo y contraseña.", "warn");
-      return;
-    }
-    if (pass.length < 6) {
-      showMsg(msg, "La contraseña debe tener al menos 6 caracteres.", "warn");
-      return;
-    }
-
-    try {
-      // 1) validar invitación ANTES de crear cuenta
-      const inv = await getInviteByCode(code);
-
-      if (!inv) {
-        showMsg(msg, "Código inválido.", "bad");
-        return;
-      }
-      if (inv.used) {
-        showMsg(msg, "Este código ya fue utilizado.", "bad");
-        return;
-      }
-      if ((inv.email || "").toLowerCase() !== email.toLowerCase()) {
-        showMsg(msg, "El correo no coincide con la invitación.", "bad");
-        return;
-      }
-
-      // 2) crear usuario Auth
-      const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-      // 3) crear perfil en /users/{uid}
-      await setDoc(doc(db, "users", cred.user.uid), {
-        email,
-        role: inv.role,
-        unidadId: inv.role === "operador" ? (inv.unidadId || null) : null,
-        createdAt: Date.now()
-      });
-
-      // 4) marcar invitación usada
-      await markInviteUsed(code, cred.user.uid);
-
-      showMsg(msg, "Registro OK. Entrando...", "ok");
-      setTimeout(goDashboard, 400);
-
-    } catch (e) {
-      // ✅ error real del registro
-      showRealError(msg, "No se pudo registrar (detalle):", e);
-    }
-  });
+ regBtn.addEventListener("click", async () => {
+   const msg = qs("msg");
+   hideMsg(msg);
+   const code = (qs("inviteCode") ? qs("inviteCode").value : "").trim().toUpperCase();
+   const email = (qs("email") ? qs("email").value : "").trim();
+   const pass = qs("password") ? qs("password").value : "";
+   if (!code || !email || !pass) {
+     showMsg(msg, "Debes completar código, correo y contraseña.", "warn");
+     return;
+   }
+   if (pass.length < 6) {
+     showMsg(msg, "La contraseña debe tener al menos 6 caracteres.", "warn");
+     return;
+   }
+   // 1) validar invitación antes de crear cuenta
+   let inv;
+   try {
+     inv = await getInviteByCode(code);
+   } catch (e) {
+     console.error("INVITE READ ERROR:", e);
+     showMsg(msg, "No se pudo validar invitación: " + detailMsg(e), "bad");
+     return;
+   }
+   if (!inv) {
+     showMsg(msg, "Código inválido.", "bad");
+     return;
+   }
+   if (inv.used) {
+     showMsg(msg, "Este código ya fue utilizado.", "bad");
+     return;
+   }
+   if ((inv.email || "").toLowerCase() !== email.toLowerCase()) {
+     showMsg(msg, "El correo no coincide con la invitación.", "bad");
+     return;
+   }
+   try {
+     // 2) crear usuario Auth
+     const cred = await createUserWithEmailAndPassword(auth, email, pass);
+     // 3) crear perfil en /users/{uid}
+     await setDoc(doc(db, "users", cred.user.uid), {
+       email,
+       role: inv.role,
+       unidadId: inv.role === "operador" ? (inv.unidadId || null) : null,
+       createdAt: Date.now()
+     });
+     // 4) marcar invitación usada
+     await markInviteUsed(code, cred.user.uid);
+     showMsg(msg, "Registro OK. Entrando...", "ok");
+     setTimeout(() => (location.href = "dashboard.html"), 600);
+   } catch (e) {
+     console.error("REGISTER ERROR:", e);
+     showMsg(msg, "No se pudo registrar: " + detailMsg(e), "bad");
+   }
+ });
 }
 
