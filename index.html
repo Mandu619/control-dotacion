@@ -4,7 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Control Dotación - Login</title>
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- ✅ CSS está dentro de /public -->
+  <link rel="stylesheet" href="public/css/style.css" />
 </head>
 <body>
   <div class="topbar">
@@ -16,18 +18,24 @@
     <div class="grid">
       <div class="card">
         <h2>Acceso</h2>
+
         <label>Correo</label>
         <input id="email" type="email" placeholder="correo@dominio.cl" />
+
         <label>Contraseña</label>
         <input id="password" type="password" placeholder="••••••••" />
+
         <div class="row" style="margin-top:12px">
           <button class="btn" id="btnLogin">Ingresar</button>
           <button class="btn secondary" id="btnForgot">Olvidé mi clave</button>
         </div>
+
         <div id="msg" class="msg" style="display:none"></div>
 
-        <hr>
-        <a href="register.html">Registrar con código de invitación</a>
+        <hr />
+
+        <!-- ✅ register está en /public -->
+        <a href="public/register.html">Registrar con código de invitación</a>
       </div>
 
       <div class="card">
@@ -37,11 +45,16 @@
           2) Te registras con ese código + tu correo + tu contraseña.<br>
           3) Luego entras y verás la vista según tu rol.
         </p>
+        <p style="color:var(--muted);margin-bottom:0">
+          Si olvidaste tu contraseña, usa “Olvidé mi clave” y recibirás un correo para restablecerla.
+        </p>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/gate.js"></script>
+  <!-- ✅ JS está dentro de /public -->
+  <script type="module" src="public/js/auth.js"></script>
+  <script type="module" src="public/js/gate.js"></script>
 </body>
 </html>
+
