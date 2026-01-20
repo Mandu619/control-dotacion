@@ -1,11 +1,15 @@
 import { auth, db } from "./firebase.js";
 import { qs, showMsg, hideMsg } from "./utils.js";
+import { auth, db } from "./firebase.js";
+import { qs, showMsg, hideMsg } from "./utils.js";
 import {
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  createUserWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+ signInWithEmailAndPassword,
+ sendPasswordResetEmail,
+ createUserWithEmailAndPassword,
+ signOut
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { getInviteByCode, markInviteUsed } from "./api.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getInviteByCode, markInviteUsed } from "./api.js";
 
@@ -183,3 +187,4 @@ if (regBtn) {
     }
   });
 }
+
