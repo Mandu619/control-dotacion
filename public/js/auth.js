@@ -64,13 +64,14 @@ if (loginBtn) {
      showMsg(msg, "Debes ingresar correo y contraseña.", "warn");
      return;
    }
-   try {
-     await signInWithEmailAndPassword(auth, email, pass);
-     location.href = "dashboard.html";
-   } catch (e) {
-     console.error("LOGIN ERROR:", e);
-     showMsg(msg, "No se pudo ingresar (detalle): " + detailMsg(e), "bad");
-   }
+  try {
+ await signInWithEmailAndPassword(auth, email, pass);
+ location.href = "dashboard.html";
+} catch (e) {
+ console.error("LOGIN ERROR FULL =>", e);
+ // Muestra el detalle exacto en pantalla
+ showMsg(msg, "ERROR EXACTO:\n" + prettyAuthError(e), "bad");
+}
  });
 } else {
  console.warn("⚠️ btnLogin NO encontrado en esta página");
@@ -159,5 +160,6 @@ if (regBtn) {
    }
  });
 }
+
 
 
