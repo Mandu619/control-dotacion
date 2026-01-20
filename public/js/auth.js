@@ -161,5 +161,11 @@ if (regBtn) {
  });
 }
 
+window.addEventListener("unhandledrejection", (ev) => {
+ console.error("UNHANDLED PROMISE:", ev.reason);
+});
+window.addEventListener("error", (ev) => {
+ console.error("WINDOW ERROR:", ev.error || ev.message);
+});
 
 
