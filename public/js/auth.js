@@ -8,6 +8,28 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getInviteByCode, markInviteUsed } from "./api.js";
+
+function prettyAuthError(e) {
+ const code = e?.code || "(sin code)";
+ const msg = e?.message || "(sin message)";
+ // Firebase suele traer info extra en estas propiedades
+ const customData = e?.customData ? JSON.stringify(e.customData) : "";
+ const name = e?.name || "";
+ // A veces viene un error interno anidado
+ const inner = e?.cause ? JSON.stringify(e.cause) : "";
+ // Intenta detectar respuestas internas (no siempre existe)
+ const resp = e?.customData?._tokenResponse
+   ? JSON.stringify(e.customData._tokenResponse)
+   : "";
+ return [
+   `code: ${code}`,
+   `name: ${name}`,
+   `message: ${msg}`,
+   customData ? `customData: ${customData}` : "",
+   resp ? `tokenResponse: ${resp}` : "",
+   inner ? `cause: ${inner}` : ""
+ ].filter(Boolean).join("\n");
+}
 /* =========================
   Helpers de debug
 ========================= */
@@ -137,4 +159,5 @@ if (regBtn) {
    }
  });
 }
+
 
