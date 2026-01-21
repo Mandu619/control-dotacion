@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase.js";
+import { auth, db } from "./firebase_v2.js";
 import { qs, showMsg, hideMsg } from "./utils.js";
 
 import {
@@ -190,6 +190,7 @@ if (regBtn) {
     }
   });
 }
+
 
 
 
