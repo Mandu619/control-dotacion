@@ -1,4 +1,4 @@
-import { auth } from "./firebase.js";
+import { auth } from "./firebase_v2.js";
 import { card, btn } from "./ui.js";
 import { qs, todayISO, isFuture, showMsg, hideMsg } from "./utils.js";
 import { listPersonnelByUnit, getReport, createEmptyReport, saveReport, lockReport } from "./api.js";
@@ -157,3 +157,4 @@ export async function renderOperador(profile){
 
   await load();
 }
+
