@@ -1,4 +1,4 @@
-import { auth } from "./firebase.js";
+import { auth } from "./firebase_v2.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getUserProfile } from "./api.js";
 import { qs } from "./utils.js";
@@ -20,3 +20,4 @@ onAuthStateChanged(auth, async (u)=>{
     mod.renderOperador(profile);
   }
 });
+
