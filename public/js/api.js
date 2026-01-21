@@ -1,4 +1,4 @@
-import { db } from "./firebase.js";
+import { db } from "./firebase_v2.js";
 import {
   collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
   query, where, orderBy, limit
@@ -89,3 +89,4 @@ export async function markInviteUsed(code, uid){
     usedAt: Date.now()
   });
 }
+
