@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Control Dotación - Login</title>
 
-  <!-- ✅ CSS está dentro de /public -->
+  <!-- CSS dentro de /public -->
   <link rel="stylesheet" href="public/css/style.css" />
 </head>
 <body>
@@ -20,21 +20,20 @@
         <h2>Acceso</h2>
 
         <label>Correo</label>
-        <input id="email" type="email" placeholder="correo@dominio.cl" />
+        <input id="email" type="email" placeholder="correo@dominio.cl" autocomplete="username" />
 
         <label>Contraseña</label>
-        <input id="password" type="password" placeholder="••••••••" />
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
 
         <div class="row" style="margin-top:12px">
-          <button class="btn" id="btnLogin">Ingresar</button>
-          <button class="btn secondary" id="btnForgot">Olvidé mi clave</button>
+          <button class="btn" id="btnLogin" type="button">Ingresar</button>
+          <button class="btn secondary" id="btnForgot" type="button">Olvidé mi clave</button>
         </div>
 
-        <div id="msg" class="msg" style="display:none"></div>
+        <div id="msg" class="msg" style="display:none; white-space:pre-wrap"></div>
 
         <hr />
 
-        <!-- ✅ register está en /public -->
         <a href="public/register.html">Registrar con código de invitación</a>
       </div>
 
@@ -52,7 +51,7 @@
     </div>
   </div>
 
-  <!-- ✅ JS está dentro de /public -->
+  <!-- JS dentro de /public -->
   <script type="module" src="public/js/auth.js"></script>
   <script type="module" src="public/js/gate.js"></script>
 </body>
