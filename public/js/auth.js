@@ -57,11 +57,8 @@ if (loginBtn) {
     const msgBox = qs("msg");
     hideMsg(msgBox);
 
-    const emailEl = qs("email");
-    const passEl = qs("password");
-
-    const email = (emailEl ? emailEl.value : "").trim();
-    const pass = (passEl ? passEl.value : "");
+    const email = (qs("email") ? qs("email").value : "").trim();
+    const pass = (qs("password") ? qs("password").value : "");
 
     if (!email || !pass) {
       showMsg(msgBox, "Debes ingresar correo y contraseña.", "warn");
@@ -92,7 +89,7 @@ if (loginBtn) {
         }
       }
 
-      // ✅ dashboard está en /public
+      // ✅ OJO: desde index.html (raíz) hacia /public/dashboard.html
       location.href = "public/dashboard.html";
 
     } catch (e) {
@@ -127,12 +124,12 @@ if (forgotBtn) {
 }
 
 /* =========================
-  LOGOUT
+  LOGOUT (si estás en /public/dashboard.html)
 ========================= */
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
-    location.href = "../index.html"; // si estás dentro de /public
+    location.href = "../index.html";
   });
 }
 
@@ -186,7 +183,9 @@ if (regBtn) {
       await markInviteUsed(code, cred.user.uid);
 
       showMsg(msgBox, "Registro OK. Entrando...", "ok");
-      setTimeout(() => (location.href = "dashboard.html"), 600); // register.html y dashboard.html están juntos en /public
+
+      // ✅ register.html está en /public, entonces dashboard.html está al lado
+      setTimeout(() => (location.href = "dashboard.html"), 600);
 
     } catch (e) {
       console.error("REGISTER ERROR:", e);
@@ -194,5 +193,4 @@ if (regBtn) {
     }
   });
 }
-
 
